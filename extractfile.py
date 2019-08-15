@@ -11,6 +11,9 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
     stock_list = [x[0] for x in os.walk(statspath)]
     #print (stock_list)
     #print ("hie")
+    df = pd.DataFrame (columns = ['Data', 'Unix','Ticker', 'DE Ratio'])
+
+
 
     for each_dir in stock_list[1:]:
         each_file = os.listdir(each_dir)
@@ -29,13 +32,18 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
                 #print (source)
 
                 try :
-                    value = source.split (gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0]
+                    value = float (source.split (gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                    df=df.append({'Date':date_stamp, 'Unix':unix_time,'Ticker':ticker,'DE Ratio':value,},ignore_index=True)
                     print (ticker + ":" , value)
                     #time.sleep(15)
 
                 except IndexError :
                     print ("out of range for :" + ticker)
 
+                except Exception as e:
+                    pass
 
-
+    save = gather.replace(' ','').replace(')','').replace('(','').replace('/','') + ('.csv')
+    print (save)
+    df.to_csv(save)
 Key_Stats()
