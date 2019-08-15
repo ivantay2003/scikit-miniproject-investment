@@ -6,7 +6,7 @@ from datetime import datetime
 path  = os.getenv("HOME") + "/Downloads/intraQuarter"
 print (path)
 
-def Key_Stats (gather="Total debt/equity (mrq)"):
+def Key_Stats (gather="Total Debt/Equity (mrq)"):
     statspath = path + '/_KeyStats'
     stock_list = [x[0] for x in os.walk(statspath)]
     #print (stock_list)
@@ -14,6 +14,7 @@ def Key_Stats (gather="Total debt/equity (mrq)"):
 
     for each_dir in stock_list[1:]:
         each_file = os.listdir(each_dir)
+        ticker = each_dir.split("\\")[0]
         #print (each_file)
 
         if len(each_file)>0:
@@ -26,9 +27,14 @@ def Key_Stats (gather="Total debt/equity (mrq)"):
                 #print (full_file_path)
                 source = open (full_file_path,'r', encoding="utf-8").read()
                 #print (source)
-                value = source.split (gather + ':</td><td class="yfnc_tabledata1">')[0].split('</td>')[1]
-                print (value)
-                time.sleep(15)
+
+                try :
+                    value = source.split (gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0]
+                    print (ticker + ":" , value)
+                    #time.sleep(15)
+
+                except IndexError :
+                    print ("out of range for :" + ticker)
 
 
 
