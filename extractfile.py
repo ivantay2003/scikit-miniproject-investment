@@ -5,6 +5,7 @@ from datetime import datetime
 
 path  = os.getenv("HOME") + "/Downloads/intraQuarter"
 print (path)
+ROOT_DIR = os.path.abspath(os.curdir)
 
 def Key_Stats (gather="Total Debt/Equity (mrq)"):
     statspath = path + '/_KeyStats'
@@ -12,7 +13,7 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
     #print (stock_list)
     #print ("hie")
     df = pd.DataFrame (columns = ['Data', 'Unix','Ticker', 'DE Ratio'])
-
+    sp500_df = pd.read_csv(ROOT_DIR + "/data/YAHOO-INDEX-GSPC.csv")
 
 
     for each_dir in stock_list[1:]:
@@ -33,14 +34,29 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
 
                 try :
                     value = float (source.split (gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+
+                    try:
+                        sp500_date = datetime.fromtimestamp(unix_time).strfttime('%Y-%m-%d')
+                        row = sp500_df[sp500_df["Date"] == sp500_date]
+                        sp500_value = float(row["Adj Close"])
+
+                    except:
+                        sp500_date = datetime.fromtimestamp(unix_time-259200).strfttime('%Y-%m-%d')
+                        row = sp500_df[sp500_df["Date"] == sp500_date]
+                        sp500_value = float(row["Adj Close"])
+
+                    stock_price = float (source.split('</small><big><b>')[1].split('</b></big>')[0])
+                    #print ("stock price : " + stock_price, "ticker:" + ticker)
+
                     df=df.append({'Date':date_stamp, 'Unix':unix_time,'Ticker':ticker,'DE Ratio':value,},ignore_index=True)
-                    print (ticker + ":" , value)
+                    #print (ticker + ":" , value)
                     #time.sleep(15)
 
                 except IndexError :
                     print ("out of range for :" + ticker)
 
                 except Exception as e:
+                    print (e)
                     pass
 
     save = gather.replace(' ','').replace(')','').replace('(','').replace('/','') + ('.csv')
