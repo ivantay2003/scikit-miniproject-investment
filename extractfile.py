@@ -12,13 +12,26 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
     stock_list = [x[0] for x in os.walk(statspath)]
     #print (stock_list)
     #print ("hie")
-    df = pd.DataFrame (columns = ['Date', 'Unix','Ticker', 'DE Ratio','Price','SP500'])
+    df = pd.DataFrame (columns = ['Date',
+                                  'Unix',
+                                  'Ticker',
+                                  'DE Ratio',
+                                  'Price',
+                                  'stock_p_change',
+                                  'SP500',
+                                  'sp500_p_change'])
     sp500_df = pd.read_csv(ROOT_DIR + "/data/YAHOO-INDEX-GSPC.csv")
+
+    ticker_list =[]
 
 
     for each_dir in stock_list[1:]:
         each_file = os.listdir(each_dir)
         ticker = each_dir.split("\\")[0]
+        ticker_list.append((ticker))
+
+        starting_stock_value=False
+        starting_sp500_value=False
         #print (each_file)
 
         if len(each_file)>0:
@@ -48,7 +61,24 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
                     stock_price = float (source.split('</small><big><b>')[1].split('</b></big>')[0])
                     #print ("stock price : " + stock_price, "ticker:" + ticker)
 
-                    df=df.append({'Date':date_stamp, 'Unix':unix_time,'Ticker':ticker,'DE Ratio':value,'Price':stock_price, 'SP500':sp500_value},ignore_index=True)
+                    if not starting_stock_value:
+                        starting_stock_value = stock_price
+                        if not starting_sp500_value:
+                            starting_sp500_value = sp500_value
+
+                    stock_p_change = ((stock_price - starting_stock_value) / starting_stock_value ) * 100
+                    sp500_p_change = ((sp500_value - starting_sp500_value) / starting_sp500_value) * 100
+                    #sp500_p_change = ((sp500_price - starting_sp500_value) / starting_sp500_value) * 100   bug 
+
+
+                    df=df.append({'Date':date_stamp,
+                                  'Unix':unix_time,
+                                  'Ticker':ticker,
+                                  'DE Ratio':value,
+                                  'Price':stock_price,
+                                  'stock_p_change':stock_p_change,
+                                  'SP500':sp500_value,
+                                  'sp500_p_change':sp500_p_change},ignore_index=True)
                     #print (ticker + ":" , value)
                     #time.sleep(15)
 
