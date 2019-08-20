@@ -36,19 +36,19 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
                     value = float (source.split (gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
 
                     try:
-                        sp500_date = datetime.fromtimestamp(unix_time).strfttime('%Y-%m-%d')
+                        sp500_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
                         row = sp500_df[sp500_df["Date"] == sp500_date]
                         sp500_value = float(row["Adj Close"])
 
                     except:
-                        sp500_date = datetime.fromtimestamp(unix_time-259200).strfttime('%Y-%m-%d')
+                        sp500_date = datetime.fromtimestamp(unix_time-259200).strftime('%Y-%m-%d')
                         row = sp500_df[sp500_df["Date"] == sp500_date]
                         sp500_value = float(row["Adj Close"])
 
                     stock_price = float (source.split('</small><big><b>')[1].split('</b></big>')[0])
                     #print ("stock price : " + stock_price, "ticker:" + ticker)
 
-                    df=df.append({'Date':date_stamp, 'Unix':unix_time,'Ticker':ticker,'DE Ratio':value,},ignore_index=True)
+                    df=df.append({'Date':date_stamp, 'Unix':unix_time,'Ticker':ticker,'DE Ratio':value,'Price':stock_price},ignore_index=True)
                     #print (ticker + ":" , value)
                     #time.sleep(15)
 
@@ -62,4 +62,6 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
     save = gather.replace(' ','').replace(')','').replace('(','').replace('/','') + ('.csv')
     print (save)
     df.to_csv(save)
+
+    print (df)
 Key_Stats()
