@@ -72,7 +72,18 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
                         row = sp500_df[sp500_df["Date"] == sp500_date]
                         sp500_value = float(row["Adj Close"])
 
-                    stock_price = float (source.split('</small><big><b>')[1].split('</b></big>')[0])
+                    try:
+                        stock_price = float (source.split('</small><big><b>')[1].split('</b></big>')[0])
+                    except Exception as e:
+                        try:
+                            stock_price = float(source.split('</small><big><b>')[1].split('</b></big>')[0])
+                            stock_price = re.search(r'(\d{1,8}\.\d{1,8})',stock_price)
+                            stock_price = float(stock_price.group(1))
+                        except Exception as e:
+                            stock_price = float(source.split('<span class="time_rtq_ticker">')[1].split('</span>')[0])
+                            stock_price = re.search(r'(\d{1,8}\.\d{1,8})',stock_price)
+                            stock_price = float(stock_price.group(1))
+                        # <span id="yfs 110 afl"></span>
                     #print ("stock price : " + stock_price, "ticker:" + ticker)
 
                     if not starting_stock_value:
@@ -115,7 +126,7 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
         except:
             pass
 
-        plt.show()
+    plt.show()
 
     save = gather.replace(' ','').replace(')','').replace('(','').replace('/','') + ('.csv')
     print (save)
