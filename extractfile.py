@@ -30,7 +30,8 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
                                   'stock_p_change',
                                   'SP500',
                                   'sp500_p_change',
-                                  'Difference'])
+                                  'Difference',
+                                  'Status'])
     sp500_df = pd.read_csv(ROOT_DIR + "/data/YAHOO-INDEX-GSPC.csv")
 
     ticker_list =[]
@@ -94,6 +95,12 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
                     stock_p_change = ((stock_price - starting_stock_value) / starting_stock_value ) * 100
                     sp500_p_change = ((sp500_value - starting_sp500_value) / starting_sp500_value) * 100
 
+                    difference = stock_p_change - sp500_p_change
+
+                    if difference > 0:
+                        status = "outperform"
+                    else:
+                        status = "underperform"
 
 
                     df=df.append({'Date':date_stamp,
@@ -104,7 +111,8 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
                                   'stock_p_change':stock_p_change,
                                   'SP500':sp500_value,
                                   'sp500_p_change':sp500_p_change,
-                                  'Difference':stock_p_change-sp500_p_change},ignore_index=True)
+                                  'Difference':difference,
+                                  'Status':status},ignore_index=True)
                     #print (ticker + ":" , value)
                     #time.sleep(15)
 
@@ -121,7 +129,13 @@ def Key_Stats (gather="Total Debt/Equity (mrq)"):
            plot_df = df [(df['Ticker']==each_ticker)]
            plot_df = plot_df.set_index(['Date'])
 
-           plot_df['Difference'].plot(label=each_ticker)
+           if plot_df['Status'][-1] =="underperform":
+               color ='r'
+           else:
+               color = 'g'
+
+
+           plot_df['Difference'].plot(label=each_ticker, color=color)
            plt.legend()
         except:
             pass
